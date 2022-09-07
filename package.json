@@ -1,0 +1,31 @@
+{
+  "dependencies": {
+    "@babel/parser": "^7.18.13"
+  },
+  "name": "lowleveljs",
+  "version": "1.0.6",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "bin": {
+    "lljs": "cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "1696292264@qq.com",
+  "license": "ISC",
+  "description": "1. 使用`@babel/parser`解析出js代码的语法树\r 2. 把所有的功能语句编译成最基础的操作指令列表\r 3. 编写解释器来运行这些基础操作指令",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/treemonster/lowleveljs.git"
+  },
+  "keywords": [
+    "confuse"
+  ],
+  "bugs": {
+    "url": "https://github.com/treemonster/lowleveljs/issues"
+  },
+  "homepage": "https://github.com/treemonster/lowleveljs#readme"
+}
