@@ -1,7 +1,7 @@
 
 const {CMDLS, NotSupport, mask, CMDLS_BIN_ext, CMDLS_FLOW_ext, CMDLS_SIG_ext, ARR_typ}=require('./common')
 const [VAR, FUNC, FVAR, MOV, BIN, IF, ARR, CAL, TRY, FOR, FLOW, ATTR, OBJ, SWITCH, SIG, COPY, FARGU, LOG]=CMDLS
-const [LGR, LSR, EQU, ADD, MULTI, SUB, DIV, AND, SEQU, SNEQU, OR, INSTANCEOF, IN, MOD, LSRE, LGRE, NEQU, BIT_MOV_LEFT, BIT_MOV_RIGHT, XOR, BIT_AND, BIT_OR]=CMDLS_BIN_ext
+const [LGR, LSR, EQU, ADD, MULTI, SUB, DIV, AND, SEQU, SNEQU, OR, INSTANCEOF, IN, MOD, LSRE, LGRE, NEQU, BIT_MOV_LEFT, BIT_MOV_RIGHT, XOR, BIT_AND, BIT_OR, NO_SYMBOL_MOV_RIGHT]=CMDLS_BIN_ext
 const [RET, THROW, BREAK, CONTINUE]=CMDLS_FLOW_ext
 const [UNARY, TYPEOF, VOID, DELETE, INIT_THIS, BIT_NEGATE]=CMDLS_SIG_ext
 const [ARR_ARRAY, ARR_MEMBER]=ARR_typ
@@ -21,7 +21,11 @@ function pack(maskarr, OUT4, MEM) {
     OUT5.push(OUT4[i].length)
     OUT5.push(...OUT4[i])
   }
-  const mem=JSON.stringify([MEM, globalContextVars]).split('').map(a=>a.charCodeAt(0))
+  const mem=JSON.stringify([MEM, (x=>{
+    let ret=[]
+    for(let k in x) ret.push(parseInt(k), x[k])
+    return ret
+  })(globalContextVars)]).split('').map(a=>a.charCodeAt(0))
   OUT5.push(mem.length)
   OUT5.push(...mem)
 
@@ -147,6 +151,7 @@ function parseNodeList(Node, contexts, ctx) {
         else if(Node.type==='ForInStatement') parseForInStatement(Node, contexts)
         else if(Node.type==='BlockStatement') parseNodeList(Node, contexts, ctx)
         else if(Node.type==='WhileStatement') parseWhileStatement(Node, contexts)
+        else if(Node.type==='EmptyStatement') ;
         else if(Node.type!=='FunctionDeclaration') {
           NotSupport(Node)
         }
@@ -364,6 +369,7 @@ function parseForStatement(Node, contexts) {
 
   const fortestval=mallocVar()
   const for_flag=rndstr()
+  let _next=0
 
   if(type==='ForStatement' || type==='WhileStatement') {
     if(init) {
@@ -389,9 +395,11 @@ function parseForStatement(Node, contexts) {
     /**
     for(k in x) {...}
     等价于
-    for(i=0, ls=Object.keys(x); i<ls.length; i++) {
-      k=x[i]
-      ...
+    if(x) {
+      for(i=0, ls=Object.keys(x); i<ls.length; i++) {
+        k=x[i]
+        ...
+      }
     }
      */
     let bind_key
@@ -408,6 +416,25 @@ function parseForStatement(Node, contexts) {
       NotSupport(left)
     }
     let loop_val=parseSideValue(right, contexts)
+
+
+    let if_flag=rndstr()
+    OUT.push({type: 'if', value: {
+      if_flag,
+      jv: loop_val,
+    }})
+
+    _next=_=>{
+
+      OUT.push({type: 'if', value: {
+        if_flag,
+      }, extra: 'else'})
+      OUT.push({type: 'if', value: {
+        if_flag,
+      }, extra: 'endif'})
+
+    }
+
     const i=mallocVar(), ls=mallocVar()
     OUT.push(`MOV ${i}, ${MEM_idxMapper.getIdxOf(0)}`)
     let fn=mallocVar(), arg=mallocVar(), key_len=mallocVar()
@@ -452,7 +479,11 @@ function parseForStatement(Node, contexts) {
   OUT.push({type: 'for', value: {
     for_flag,
   }, extra: 'endfor'})
+
+  if(_next) _next()
+
 }
+
 function parseSequenceExpression(Node, contexts, ret) {
   const {expressions}=Node
   expressions.map((Node, i)=>{
@@ -563,6 +594,8 @@ function parseBinaryExpression(Node, contexts, retVal) {
     OUT.push(`BIN ${retVal}, ${BIT_OR}, ${retVal}, ${retVal2}`)
   }else if(operator==='&') {
     OUT.push(`BIN ${retVal}, ${BIT_AND}, ${retVal}, ${retVal2}`)
+  }else if(operator==='>>>') {
+    OUT.push(`BIN ${retVal}, ${NO_SYMBOL_MOV_RIGHT}, ${retVal}, ${retVal2}`)
   }else{
     NotSupport(operator)
   }

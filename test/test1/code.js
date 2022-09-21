@@ -1,4 +1,9 @@
+if(1);
+
+/*
 !function(){
+
+  console.log(100>>>2)
 
   //console.log(TTT)
   AA={xx: {yy: 7}}

@@ -47,6 +47,7 @@ let CMDLS_BIN_ext=[
   CMDLS_BIN_ext_i++, // XOR ^
   CMDLS_BIN_ext_i++, // BIT_AND &
   CMDLS_BIN_ext_i++, // BIT_OR |
+  CMDLS_BIN_ext_i++, // NO_SYMBOL_MOV_RIGHT >>>
 ]
 
 // CMDLS.SIG的子标志位

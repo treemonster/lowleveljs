@@ -8,13 +8,14 @@ function run(maskstr, file, bindVars) {
   if(typeof file==='string' && isNode) {
     _filename=file
     _bin=require('fs').readFileSync(file)
-  }else if(file.constructor===Uint8Array || (isNode && file.constructor===Buffer)) {
+  }else if(file.constructor===Uint8Array || file.constructor===Array || (isNode && file.constructor===Buffer)) {
     _bin=file
   }else if(file.constructor===Object) {
     const {content, filename}=file
     _bin=content
     _filename=filename
   }
+
   if(!_bin) {
     throw new Error('no content input')
   }
@@ -51,4 +52,52 @@ exports.compile=(maskstr, code)=>{
 }
 exports.require_lljs=(...argv)=>{
   return run(...argv).module.exports
+}
+
+// _compile(code, {repVars: 'T_', transform: 1, uglifyjs: 1, mask: 'xxx'})
+exports._compile=(sourceCode, opts)=>{
+  let steps={}
+  if(opts.repVars) {
+    console.log('正在替换`'+opts.repVars+'`开头的变量..')
+    let T_vals={}, T_valsI=Date.now()%1e3
+    sourceCode=sourceCode.replace(new RegExp('\\b'+opts.repVars+'[a-z\\d_$]+\\b', 'ig'), a=>{
+      if(T_vals[a]) return T_vals[a]
+      T_valsI+=Math.random()*9+1|1
+      T_vals[a]=opts.repVars+T_valsI.toString(36)
+      return T_vals[a]
+    })
+    steps._afterRepVals=sourceCode
+    console.log(`替换结果：`)
+    console.log(T_vals)
+  }
+  if(opts.transform) {
+    console.log('正在转换为es5语法，并添加polyfill..')
+    const brc={
+      "plugins": ["@babel/plugin-transform-async-to-generator"],
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "useBuiltIns": "entry",
+            "corejs": 2
+          }
+        ]
+      ]
+    }
+    sourceCode=require('@babel/core').transform(sourceCode, brc).code
+    steps._afterTransfrom=sourceCode
+  }
+  if(opts.uglifyjs) {
+    console.log('正在使用uglifyjs混淆代码..')
+    const UglifyJS=require("uglify-js")
+    sourceCode=UglifyJS.minify('(function() {\n'+sourceCode+'\n})()', {
+      output: {
+        beautify: opts.min? false: true,
+      },
+    }).code
+    steps._afterUglifyjs=sourceCode
+  }
+  const Ret=exports.compile(opts.mask, sourceCode)
+  Object.assign(Ret, steps)
+  return Ret
 }

@@ -1,7 +1,7 @@
 
 const {CMDLS, NotSupport, mask, CMDLS_BIN_ext, CMDLS_FLOW_ext, CMDLS_SIG_ext, ARR_typ}=require('./common')
 const [VAR, FUNC, FVAR, MOV, BIN, IF, ARR, CAL, TRY, FOR, FLOW, ATTR, OBJ, SWITCH, SIG, COPY, FARGU, LOG]=CMDLS
-const [LGR, LSR, EQU, ADD, MULTI, SUB, DIV, AND, SEQU, SNEQU, OR, INSTANCEOF, IN, MOD, LSRE, LGRE, NEQU, BIT_MOV_LEFT, BIT_MOV_RIGHT, XOR, BIT_AND, BIT_OR]=CMDLS_BIN_ext
+const [LGR, LSR, EQU, ADD, MULTI, SUB, DIV, AND, SEQU, SNEQU, OR, INSTANCEOF, IN, MOD, LSRE, LGRE, NEQU, BIT_MOV_LEFT, BIT_MOV_RIGHT, XOR, BIT_AND, BIT_OR, NO_SYMBOL_MOV_RIGHT]=CMDLS_BIN_ext
 const [RET, THROW, BREAK, CONTINUE]=CMDLS_FLOW_ext
 const [UNARY, TYPEOF, VOID, DELETE, INIT_THIS, BIT_NEGATE]=CMDLS_SIG_ext
 const [ARR_ARRAY, ARR_MEMBER]=ARR_typ
@@ -44,7 +44,11 @@ function unpack(OUT6, outerVars, top, maskarr) {
     OUT.push(_out1.slice(c+1, c+n+1))
     c+=1+n
   }
-  let [MEM, globalContextVars]=JSON.parse(String.fromCharCode(..._out1.slice(c+1, c+1+_out1[c])))
+  let [MEM, gv]=JSON.parse(String.fromCharCode(..._out1.slice(c+1, c+1+_out1[c])))
+  let globalContextVars={}
+  for(let i=0; i<gv.length; i+=2) {
+    globalContextVars[gv[i]]=gv[i+1]
+  }
   c+=1+_out1[c]
 
   const gobj={}
@@ -200,6 +204,7 @@ function runner(SEQ, MEM, contexts, begin=0, end=-1, params=null) {
       else if(op===XOR) rr=p1 ^ p2
       else if(op===BIT_AND) rr=p1 & p2
       else if(op===BIT_OR) rr=p1 | p2
+      else if(op===NO_SYMBOL_MOV_RIGHT) rr=p1 >>> p2
       else NotSupport(op)
       set_val(contexts, ret, rr)
     }else if(CMD===IF) {
@@ -252,8 +257,9 @@ function runner(SEQ, MEM, contexts, begin=0, end=-1, params=null) {
         let fn, _this
         for(let i=0; i<func.length; i++) {
           if(!i) {
-            if(typeof func[i]==='string') fn=find_val(contexts, func[i], 1)
-            else fn=func[i]
+            // if(typeof func[i]==='string') fn=find_val(contexts, func[i], 1)
+            // else
+            fn=func[i]
           }else{
             fn=fn[func[i]]
           }
@@ -265,6 +271,7 @@ function runner(SEQ, MEM, contexts, begin=0, end=-1, params=null) {
       }else if(func.constructor===String) {
         realFunc=find_val(contexts, func, 1)
       }else{
+        // console.log(func, argu, [argu.length], i+1, {isNew, ret, fn, argv})
         NotSupport(func)
       }
 

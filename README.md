@@ -119,6 +119,6 @@
 
 2. 特定场景生成的指令可能有问题
 
-3. 明确不支持eval, with, arguments.callee, arguments.caller
+3. 不支持with, arguments.callee, arguments.caller
 
 4. 使用问题可抛到：https://github.com/treemonster/lowleveljs/issues
