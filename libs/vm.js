@@ -66,29 +66,22 @@ let OUT3 // 此变量仅用于调试，因此不考虑窜线场景
 
 function find_val(contexts, val, useValue, mustDefined) {
 	for(let j=contexts.length; j-->0; ) {
-    if(!contexts[j][val]) continue
-  	const o=contexts[j][val]
+    const o=contexts[j][val]
+    if(!o) continue
     return useValue? o.value: o
   }
   if(mustDefined) {
     throw new Error(`${val} is not defined`)
   }
-  contexts[0][val]={value: val, type: typeVar}
-  const o=contexts[0][val]
+  const o={value: val, type: typeVar}
+  contexts[0][val]=o
   return useValue? o.value: o
 }
+
 function parse_val(SEQ, MEM, contexts, x, fullNode, notMustDefined) {
   let _ret=node=>fullNode? node: node.value
 	if(x<MEM.length) return _ret({value: MEM[x], type: typeGlobalObject})
-  let v=find_val(contexts, x, 0, notMustDefined? 0: 1)
-  if(v.type!==typeFunc) return _ret(v)
-  const [begin_l, end_l]=v.value
-  return _ret(v.extraFunc=v.extraFunc||{value: function(...argu) {
-    const fctx={}
-    let params=[argu, 0, undefined, this]
-    runner(SEQ, MEM, contexts.concat([fctx]), begin_l, end_l, params)
-    return params[2]
-  }, type: typeFunc})
+  return _ret(find_val(contexts, x, 0, notMustDefined? 0: 1))
 }
 function set_val(contexts, key, val, type) {
   const found=find_val(contexts, key)
@@ -103,14 +96,16 @@ function parse_member_array(arr) {
 function runner(SEQ, MEM, contexts, begin=0, end=-1, params=null) {
   if(end===-1) {
     const globalContext=contexts[0]
-    let ctx2={}
+    let ctx2={
+      _lastContexts: [0, {}],
+    }
     for(let a in globalContext) {
       ctx2[a]={value: globalContext[a], type: typeGlobalObject}
     }
     contexts=[ctx2]
   }
 	contexts=contexts.concat([])
-  for(let i=begin, ctx=contexts[contexts.length-1]; i<(end<0? SEQ.length: end); i++) {
+  for(let i=begin, ctx=contexts[contexts.length-1], I=(end<0? SEQ.length: end); i<I; i++) {
     // console.log("###", [i, end], OUT3[i], SEQ[i])
   	const [CMD, ...argv]=SEQ[i]
     if(CMD===FVAR) {
@@ -221,12 +216,17 @@ function runner(SEQ, MEM, contexts, begin=0, end=-1, params=null) {
   	  argv.map(v=>ctx[v]={value: undefined, type: typeVar})
   	}else if(CMD===FUNC) {
   	  const [func_fn, func_line_end]=argv
-      set_val(contexts, func_fn, [i+1, func_line_end], typeFunc)
+      const [begin_l, end_l]=[i+1, func_line_end]
+      set_val(contexts, func_fn, function(...argu) {
+        let params=[argu, 0, undefined, this]
+        runner(SEQ, MEM, contexts.concat([{}]), begin_l, end_l, params)
+        return params[2]
+      }, typeFunc)
   	  i=func_line_end-1
   	}else if(CMD===MOV) {
       for(let i=0, n=argv.length/2; i<n; i++) {
-        let v=parse_val(SEQ, MEM, contexts, argv[n+i], 1)
-  		  set_val(contexts, argv[i], v.type===typeArrMember? parse_member_array(v.value): v.value)
+        let {type, value}=parse_val(SEQ, MEM, contexts, argv[n+i], 1)
+  		  set_val(contexts, argv[i], type===typeArrMember? parse_member_array(value): value)
       }
   	}else if(CMD===ARR) {
       let [val, ...x]=argv
@@ -271,7 +271,6 @@ function runner(SEQ, MEM, contexts, begin=0, end=-1, params=null) {
       }else if(func.constructor===String) {
         realFunc=find_val(contexts, func, 1)
       }else{
-        // console.log(func, argu, [argu.length], i+1, {isNew, ret, fn, argv})
         NotSupport(func)
       }
 

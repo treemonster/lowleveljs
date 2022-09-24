@@ -2,18 +2,15 @@ const fs=require('fs')
 const {compile, _compile, run}=require(__dirname+'/../..')
 const maskstr=0
 
-
-const {TXT, MEM, GVARS, SEQ, BIN, _afterUglifyjs, _afterTransfrom}=_compile(fs.readFileSync(__dirname+'/code.js', 'utf8'), {
+const {TXT, MEM, GVARS, SEQ, BIN, _afterTransfrom, _afterUglifyjs}=_compile(fs.readFileSync(__dirname+'/code.js', 'utf8'), {
   repVars: 'T_',
   transform: 1,
-  uglifyjs: 1,
+  uglifyjs: 0,
   mask: maskstr,
 })
-fs.writeFileSync(__dirname+'/code.raw.js', _afterUglifyjs)
 
-
-// const {TXT, MEM, GVARS, SEQ, BIN}=compile(maskstr, fs.readFileSync(__dirname+'/code.raw.js', 'utf8'))
-// const {TXT, MEM, GVARS, SEQ, BIN}=compile(maskstr, fs.readFileSync(__dirname+'/code.js', 'utf8'))
+fs.writeFileSync(__dirname+'/code.raw.js', _afterTransfrom)
+// fs.writeFileSync(__dirname+'/code.raw.js', _afterUglifyjs)
 
 console.log('预编译结果 <数字(表示MEM的下标，或者该指令的特殊用法) 和 变量名称>：')
 console.log(TXT)

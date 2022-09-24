@@ -42,19 +42,19 @@
                             var n = r.iterator[e.method];
                             if (void 0 === n) {
                                 if (e.delegate = null, "throw" === e.method) {
-                                    if (r.iterator.return && (e.method = "return",
+                                    if (r.iterator.return && (e.method = "return", 
                                     e.arg = void 0, t(r, e), "throw" === e.method)) return h;
                                     e.method = "throw", e.arg = new TypeError("The iterator does not provide a 'throw' method");
                                 }
                                 return h;
                             }
                             n = f(n, r.iterator, e.arg);
-                            if ("throw" === n.type) return e.method = "throw", e.arg = n.arg,
+                            if ("throw" === n.type) return e.method = "throw", e.arg = n.arg, 
                             e.delegate = null, h;
                             n = n.arg;
-                            return n ? n.done ? (e[r.resultName] = n.value, e.next = r.nextLoc,
-                            "return" !== e.method && (e.method = "next", e.arg = void 0),
-                            e.delegate = null, h) : n : (e.method = "throw", e.arg = new TypeError("iterator result is not an object"),
+                            return n ? n.done ? (e[r.resultName] = n.value, e.next = r.nextLoc, 
+                            "return" !== e.method && (e.method = "next", e.arg = void 0), 
+                            e.delegate = null, h) : n : (e.method = "throw", e.arg = new TypeError("iterator result is not an object"), 
                             e.delegate = null, h);
                         }(e, a);
                         if (e) {
@@ -75,7 +75,7 @@
                             done: a.done
                         };
                     }
-                    "throw" === e.type && (c = "completed", a.method = "throw",
+                    "throw" === e.type && (c = "completed", a.method = "throw", 
                     a.arg = e.arg);
                 }
             }), r;
@@ -100,7 +100,7 @@
         function p() {}
         var r = {}, y = (i(r, n, function() {
             return this;
-        }), Object.getPrototypeOf), y = y && y(y(b([]))), d = (y && y !== t && u.call(y, n) && (r = y),
+        }), Object.getPrototypeOf), y = y && y(y(b([]))), d = (y && y !== t && u.call(y, n) && (r = y), 
         p.prototype = s.prototype = Object.create(r));
         function v(t) {
             [ "next", "throw", "return" ].forEach(function(r) {
@@ -136,7 +136,7 @@
             var r = {
                 tryLoc: t[0]
             };
-            1 in t && (r.catchLoc = t[1]), 2 in t && (r.finallyLoc = t[2], r.afterLoc = t[3]),
+            1 in t && (r.catchLoc = t[1]), 2 in t && (r.finallyLoc = t[2], r.afterLoc = t[3]), 
             this.tryEntries.push(r);
         }
         function w(t) {
@@ -154,7 +154,7 @@
                 if (t) return t.call(r);
                 if ("function" == typeof r.next) return r;
                 if (!isNaN(r.length)) return e = -1, (t = function t() {
-                    for (;++e < r.length; ) if (u.call(r, e)) return t.value = r[e],
+                    for (;++e < r.length; ) if (u.call(r, e)) return t.value = r[e], 
                     t.done = !1, t;
                     return t.value = void 0, t.done = !0, t;
                 }).next = t;
@@ -169,12 +169,12 @@
                 done: !0
             };
         }
-        return i(d, "constructor", l.prototype = p), i(p, "constructor", l), l.displayName = i(p, o, "GeneratorFunction"),
+        return i(d, "constructor", l.prototype = p), i(p, "constructor", l), l.displayName = i(p, o, "GeneratorFunction"), 
         a.isGeneratorFunction = function(t) {
             t = "function" == typeof t && t.constructor;
             return !!t && (t === l || "GeneratorFunction" === (t.displayName || t.name));
         }, a.mark = function(t) {
-            return Object.setPrototypeOf ? Object.setPrototypeOf(t, p) : (t.__proto__ = p,
+            return Object.setPrototypeOf ? Object.setPrototypeOf(t, p) : (t.__proto__ = p, 
             i(t, o, "GeneratorFunction")), t.prototype = Object.create(d), t;
         }, a.awrap = function(t) {
             return {
@@ -205,8 +205,8 @@
         }, a.values = b, x.prototype = {
             constructor: x,
             reset: function(t) {
-                if (this.prev = 0, this.next = 0, this.sent = this._sent = void 0,
-                this.done = !1, this.delegate = null, this.method = "next", this.arg = void 0,
+                if (this.prev = 0, this.next = 0, this.sent = this._sent = void 0, 
+                this.done = !1, this.delegate = null, this.method = "next", this.arg = void 0, 
                 this.tryEntries.forEach(w), !t) for (var r in this) "t" === r.charAt(0) && u.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = void 0);
             },
             stop: function() {
@@ -219,7 +219,7 @@
                 if (this.done) throw e;
                 var n = this;
                 function t(t, r) {
-                    return i.type = "throw", i.arg = e, n.next = t, r && (n.method = "next",
+                    return i.type = "throw", i.arg = e, n.next = t, r && (n.method = "next", 
                     n.arg = void 0), !!r;
                 }
                 for (var r = this.tryEntries.length - 1; 0 <= r; --r) {
@@ -248,26 +248,26 @@
                     }
                 }
                 var i = (o = o && ("break" === t || "continue" === t) && o.tryLoc <= r && r <= o.finallyLoc ? null : o) ? o.completion : {};
-                return i.type = t, i.arg = r, o ? (this.method = "next", this.next = o.finallyLoc,
+                return i.type = t, i.arg = r, o ? (this.method = "next", this.next = o.finallyLoc, 
                 h) : this.complete(i);
             },
             complete: function(t, r) {
                 if ("throw" === t.type) throw t.arg;
-                return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg,
-                this.method = "return", this.next = "end") : "normal" === t.type && r && (this.next = r),
+                return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, 
+                this.method = "return", this.next = "end") : "normal" === t.type && r && (this.next = r), 
                 h;
             },
             finish: function(t) {
                 for (var r = this.tryEntries.length - 1; 0 <= r; --r) {
                     var e = this.tryEntries[r];
-                    if (e.finallyLoc === t) return this.complete(e.completion, e.afterLoc),
+                    if (e.finallyLoc === t) return this.complete(e.completion, e.afterLoc), 
                     w(e), h;
                 }
             },
             catch: function(t) {
                 for (var r = this.tryEntries.length - 1; 0 <= r; --r) {
                     var e, n, o = this.tryEntries[r];
-                    if (o.tryLoc === t) return "throw" === (e = o.completion).type && (n = e.arg,
+                    if (o.tryLoc === t) return "throw" === (e = o.completion).type && (n = e.arg, 
                     w(o)), n;
                 }
                 throw new Error("illegal catch attempt");
@@ -305,38 +305,34 @@
         };
     }
     function e() {
-      console.log(111)
-        return (e = t(_().mark(function t(r) {
-          console.log(">>", t)
+        return (e = t(_().mark(function t() {
             return _().wrap(function(t) {
                 for (;;) switch (t.prev = t.next) {
                   case 0:
-                    console.log(">>", r);
+                    console.log(2);
 
                   case 1:
                   case "end":
                     return t.stop();
                 }
             }, t);
-        })), console.log(444), e).apply(this, arguments);
+        }))).apply(this, arguments);
     }
     var r;
-    console.log(222)
     r = t(_().mark(function t(r) {
         return _().wrap(function(t) {
             for (;;) switch (t.prev = t.next) {
               case 0:
-                !function() {
-                    e.apply(this, arguments);
-                }(2);
+                return t.next = 2, function() {
+                    return e.apply(this, arguments);
+                }();
 
-              case 1:
+              case 2:
               case "end":
                 return t.stop();
             }
         }, t);
-    })),
-    console.log(333), function() {
+    })), function() {
         r.apply(this, arguments);
     }();
 }();

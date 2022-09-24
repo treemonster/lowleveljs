@@ -92,7 +92,7 @@ exports._compile=(sourceCode, opts)=>{
     const UglifyJS=require("uglify-js")
     sourceCode=UglifyJS.minify('(function() {\n'+sourceCode+'\n})()', {
       output: {
-        beautify: opts.min? false: true,
+        beautify: opts.beautify? false: true,
       },
     }).code
     steps._afterUglifyjs=sourceCode
